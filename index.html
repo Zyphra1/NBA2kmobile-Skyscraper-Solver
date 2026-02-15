@@ -1,22 +1,45 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Skyscraper Solver Pro</title>
+<meta charset="UTF-8">
+<title>Skyscraper Solver</title>
 
 <style>
 body {
+  margin: 0;
   font-family: "Segoe UI", Arial;
-  background-color: #000000;
-  text-align: center;
-  padding: 20px;
+  background: black;
+  color: white;
 }
 
+/* ===== layout ซ้าย-ขวา ===== */
+.layout {
+  display: flex;
+  justify-content: space-between;   /* ซ้ายสุด - ขวาสุด */
+  align-items: flex-start;
+  padding: 40px 80px;
+}
+
+/* ===== รูปด้านซ้าย ===== */
+.howto {
+  width: 45%;
+}
+
+.howto img {
+  width: 100%;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+}
+
+/* ===== Solver ด้านขวา ===== */
 .container {
+  width: 45%;
   background: white;
+  color: black;
   padding: 25px;
-  border-radius: 14px;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-  display: inline-block;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  text-align: center;
 }
 
 .grid {
@@ -32,16 +55,8 @@ input {
   font-size: 18px;
   border-radius: 8px;
   border: 2px solid #dcdcdc;
-  transition: 0.2s;
 }
 
-input:focus {
-  outline: none;
-  border-color: #4a90e2;
-  box-shadow: 0 0 6px rgba(74,144,226,0.4);
-}
-
-/* remove spinner */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -50,65 +65,63 @@ input::-webkit-inner-spin-button {
 input[type=number] { -moz-appearance: textfield; }
 
 button {
-  padding: 10px 22px;
-  font-size: 16px;
+  padding: 10px 20px;
+  font-size: 15px;
   border-radius: 8px;
   border: none;
   cursor: pointer;
-  margin: 8px;
+  margin: 6px;
   font-weight: bold;
 }
 
-.solve-btn {
-  background: #4CAF50;
-  color: white;
-}
-
-.reset-btn {
-  background: #f44336;
-  color: white;
-}
+.solve-btn { background: #4CAF50; color: white; }
+.reset-btn { background: #f44336; color: white; }
 
 select {
   padding: 6px;
-  font-size: 15px;
+  font-size: 14px;
   border-radius: 6px;
 }
 
-/* 🎨 answer colors */
+/* สีคำตอบ */
 .c1 { background: #e3f2fd; }
 .c2 { background: #e8f5e9; }
 .c3 { background: #fff3e0; }
 .c4 { background: #fce4ec; }
 .c5 { background: #ede7f6; }
-
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="layout">
 
-<h2>🏙️ Skyscraper Solver</h2>
+  <!-- ===== ซ้าย ===== -->
+  <div class="howto">
+    <h2>📖 วิธีใช้</h2>
+    <img src="./howto.png" alt="วิธีทำ">
+  </div>
 
-<label>Size:</label>
-<select id="sizeSelect" onchange="buildUI()">
-<option value="3">3×3</option>
-<option value="4" selected>4×4</option>
-<option value="5">5×5</option>
-</select>
+  <!-- ===== ขวา ===== -->
+  <div class="container">
+    <h2>🏙️ Skyscraper Solver</h2>
 
-<div id="puzzle"></div>
+    <label>Size:</label>
+    <select id="sizeSelect" onchange="buildUI()">
+      <option value="3">3×3</option>
+      <option value="4" selected>4×4</option>
+      <option value="5">5×5</option>
+    </select>
 
-<button class="solve-btn" onclick="solve()">Solve</button>
-<button class="reset-btn" onclick="resetPuzzle()">Reset</button>
+    <div id="puzzle"></div>
+
+    <button class="solve-btn" onclick="solve()">Solve</button>
+    <button class="reset-btn" onclick="resetPuzzle()">Reset</button>
+  </div>
 
 </div>
 
 <script>
-
-// ---------- UI ----------
-
 function buildUI() {
   const size = +sizeSelect.value;
   puzzle.innerHTML = "";
@@ -158,21 +171,11 @@ function resetPuzzle() {
     }
 }
 
-// ---------- Solver ----------
-
 function visible(line) {
   let max=0,count=0;
   for (let h of line)
     if (h>max){max=h;count++;}
   return count;
-}
-
-function checkPartial(line, clue) {
-  if (!clue) return true;
-  let max=0,count=0;
-  for (let h of line)
-    if (h>max){max=h;count++;}
-  return count <= clue;
 }
 
 function validFull(line, left, right) {
@@ -182,7 +185,6 @@ function validFull(line, left, right) {
 
 function permutations(n) {
   const nums=[...Array(n)].map((_,i)=>i+1);
-
   function perm(a){
     if(a.length<=1) return [a];
     let res=[];
@@ -192,7 +194,6 @@ function permutations(n) {
     }
     return res;
   }
-
   return perm(nums);
 }
 
@@ -208,7 +209,6 @@ function solve(){
   }
 
   const perms = permutations(size);
-
   const rowOptions = left.map((_,i)=>
     perms.filter(p=>validFull(p,left[i],right[i]))
   );
@@ -226,32 +226,18 @@ function solve(){
 
     for(let row of rowOptions[r]){
       let ok=true;
-
       for(let c=0;c<size;c++){
-        if(cols[c].includes(row[c])){
-          ok=false;
-          break;
-        }
-
-        const test=[...cols[c],row[c]];
-        if(!checkPartial(test,top[c])){
-          ok=false;
-          break;
-        }
+        if(cols[c].includes(row[c])){ ok=false; break; }
       }
-
       if(!ok) continue;
 
       grid[r]=row;
-      for(let c=0;c<size;c++)
-        cols[c].push(row[c]);
+      for(let c=0;c<size;c++) cols[c].push(row[c]);
 
       if(backtrack(r+1)) return true;
 
-      for(let c=0;c<size;c++)
-        cols[c].pop();
+      for(let c=0;c<size;c++) cols[c].pop();
     }
-
     return false;
   }
 
@@ -260,7 +246,6 @@ function solve(){
     return;
   }
 
-  // 🎨 show result with colors
   for(let r=0;r<size;r++){
     for(let c=0;c<size;c++){
       const cell=document.getElementById(`grid-${r}-${c}`);
@@ -272,17 +257,7 @@ function solve(){
 }
 
 buildUI();
-
 </script>
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
